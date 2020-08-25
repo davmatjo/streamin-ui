@@ -78,20 +78,35 @@ const App = () => {
     }, [vid]);
 
     useEffect(() => {
-        console.log("Creating new connection")
-        const conn = new WebSocket("ws://" + document.location.host + "/ws");
-        conn.onclose = function () {
-            alert("connection closed");
-        };
-        setConn(conn);
+        const start = (reconnect) => {
+            console.log("Creating new connection")
+            const conn = new WebSocket("ws://" + document.location.host + "/ws");
+            conn.onclose = () => {
+                alert("connection closed");
+                setTimeout(() => start(true), 5000)
+            };
+
+            setConn(conn);
+            if (reconnect) {
+                conn.addEventListener("open", () => {
+                    if (username !== "") {
+                        createUser(username)
+                    }
+                    alert("reconnected")
+                })
+            }
+        }
+        start(false);
     }, [])
+
+    const createUser = (u) => {
+        conn.send(JSON.stringify({Type: "i", Action: "name", Data: u}))
+        setUsername(u);
+    }
 
     return (
         <div className={classes.root}>
-            <UserInput open={username === ""} onSetUsername={(u) => {
-                conn.send(JSON.stringify({Type: "i", Action: "name", Data: u}))
-                setUsername(u);
-            }}/>
+            <UserInput open={username === ""} onSetUsername={createUser}/>
             <div className={classes.fillWidth}>
                 <Communicator
                     player={player}
