@@ -19,6 +19,12 @@ const onControlMessage = (m, player) => {
                 player.seekTo({position: m.Data})
             }
             break;
+        case "media":
+            player.loadVideo({
+                url: `/media/${m.Data}/manifest.mpd`,
+                transport: "dash",
+                autoPlay: true
+            });
     }
 }
 

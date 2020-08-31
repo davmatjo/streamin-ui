@@ -17,7 +17,7 @@ import Slider from "@material-ui/core/Slider";
 const useStyles = makeStyles((theme) => ({
     formControl: {
         margin: theme.spacing(1),
-        minWidth: 120,
+        minWidth: 200,
     },
     selectEmpty: {
         marginTop: theme.spacing(2),
@@ -67,9 +67,9 @@ const enterFullscreen = (player) => {
 const VideoController = (props) => {
     const classes = useStyles();
 
-    const [videoTracks, setVideoTracks] = useState(null);
-    const [audioTracks, setAudioTracks] = useState(null);
-    const [textTracks, setTextTracks] = useState(null);
+    let [videoTracks, setVideoTracks] = useState(null);
+    let [audioTracks, setAudioTracks] = useState(null);
+    let [textTracks, setTextTracks] = useState(null);
     const [refresh, setRefresh] = useState(false);
 
     useEffect(() => {
@@ -90,8 +90,15 @@ const VideoController = (props) => {
 
     }, [props.player])
 
-    if (!props.player || !audioTracks || !videoTracks) {
+    if (!props.player) {
         return null
+    }
+
+    if (!audioTracks) {
+        audioTracks = []
+    }
+    if (!textTracks) {
+        textTracks = []
     }
 
     const audioTrack = props.player.getAudioTrack()

@@ -3,6 +3,11 @@ import VisibilityIcon from '@material-ui/icons/Visibility';
 import Button from "@material-ui/core/Button";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import TextField from "@material-ui/core/TextField";
+import {Grid} from "@material-ui/core";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+import InputLabel from "@material-ui/core/InputLabel";
+import FormControl from "@material-ui/core/FormControl";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -22,6 +27,9 @@ const useStyles = makeStyles((theme) => ({
     },
     fillWidth: {
         width: "100%"
+    },
+    button: {
+        height: "100%"
     }
 }));
 
@@ -31,22 +39,55 @@ const Chat = (props) => {
     const bottom = useRef(null);
 
     const [input, setInput] = useState("");
+    const [availableMedia, setAvailableMedia] = useState([]);
+    const [media, setMedia] = useState(null)
 
     useEffect(() => {
         bottom.current.scrollIntoView({behavior: "smooth"})
     })
 
+    useEffect(() => {
+        fetch("/api/media")
+            .then(r => r.json()
+                .then(r => setAvailableMedia(r["Items"])))
+    }, [])
+
     return (
         <div className={classes.container}>
-            <Button
-                variant="outlined"
-                color="primary"
-                disabled
-                className={classes.button}
-                startIcon={<VisibilityIcon/>}
-            >
-                {props.viewers}
-            </Button>
+            <Grid container spacing={2}>
+                <Grid item xs={props.leader ? 4 : 12}>
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        color="primary"
+                        disabled
+                        className={classes.button}
+                        startIcon={<VisibilityIcon/>}
+                    >
+                        {props.viewers}
+                    </Button>
+                </Grid>
+                {props.leader && <Grid item xs={8}>
+                    <FormControl fullWidth variant="outlined">
+                        <InputLabel>Media Choice</InputLabel>
+                        <Select
+                            value={media}
+                            fullWidth
+                            onChange={(e) => {
+                                props.onSelectMedia(e.target.value)
+                                setMedia(e.target.value)
+                            }}
+                        >
+                            {
+                                availableMedia.map((m) => (
+                                    <MenuItem key={m}
+                                              value={m}>{m}</MenuItem>
+                                ))
+                            }
+                        </Select>
+                    </FormControl>
+                </Grid>}
+            </Grid>
 
             <div className={classes.messageContainer}>
                 {props.messages.map((m) => (
@@ -54,7 +95,7 @@ const Chat = (props) => {
                     <p className={classes.message}><b>{m.Action}</b>: {m.Data}</p>
 
                 ))}
-                <div style={{ float:"left", clear: "both" }}
+                <div style={{float: "left", clear: "both"}}
                      ref={bottom}>
                 </div>
             </div>
@@ -78,7 +119,8 @@ const Chat = (props) => {
                 </form>
             </div>
         </div>
-    );
+    )
+        ;
 };
 
 export default Chat;

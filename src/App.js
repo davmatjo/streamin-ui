@@ -48,13 +48,6 @@ const initVid = (vid) => {
         console.log("the content stopped with the following error", err);
     });
 
-    // play a video
-    player.loadVideo({
-        url: "/media/11/manifest.mpd",
-        transport: "dash",
-        autoPlay: true
-    });
-
     return player
 }
 
@@ -124,7 +117,9 @@ const App = () => {
                             <Chat
                                 viewers={viewers}
                                 messages={messages}
+                                leader={leader}
                                 onSubmitMessage={(m) => conn.send(JSON.stringify({Type: "m", Data: m}))}
+                                onSelectMedia={(m) => conn.send(JSON.stringify({Type: "c", Action: "media", Data: m}))}
                             />
                         </Paper>
                     </Grid>
