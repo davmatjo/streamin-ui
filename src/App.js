@@ -73,12 +73,21 @@ const App = () => {
     useEffect(() => {
         const start = (reconnect) => {
             console.log("Creating new connection")
-            const conn = new WebSocket("ws://" + document.location.host + "/ws");
+            let proto = "";
+            if (window.location.protocol === "https:") {
+                proto += "wss://"
+            } else {
+                proto += "ws://"
+            }
+            const conn = new WebSocket(proto + document.location.host + "/ws");
             conn.onclose = () => {
                 alert("connection closed");
                 setTimeout(() => start(true), 5000)
             };
 
+            conn.addEventListener("open", () => {
+                conn.send(JSON.stringify({Type: "i", Action: "media", Data: ""}))
+            })
             setConn(conn);
             if (reconnect) {
                 conn.addEventListener("open", () => {
@@ -104,6 +113,7 @@ const App = () => {
                 <Communicator
                     player={player}
                     conn={conn}
+                    leader={leader}
                     onLeaderElection={() => setLeader(true)}
                     onMessage={(m) => setMessages([...messages, m])}
                     onViewers={(v) => setViewers(v)}
@@ -119,7 +129,14 @@ const App = () => {
                                 messages={messages}
                                 leader={leader}
                                 onSubmitMessage={(m) => conn.send(JSON.stringify({Type: "m", Data: m}))}
-                                onSelectMedia={(m) => conn.send(JSON.stringify({Type: "c", Action: "media", Data: m}))}
+                                onSelectMedia={(m) => {
+                                    conn.send(JSON.stringify({Type: "i", Action: "media", Data: m}));
+                                    player.loadVideo({
+                                        url: `/media/${m}/manifest.mpd`,
+                                        transport: "dash",
+                                        autoPlay: true
+                                    });
+                                }}
                             />
                         </Paper>
                     </Grid>

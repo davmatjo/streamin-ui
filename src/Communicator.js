@@ -87,7 +87,9 @@ const Communicator = (props) => {
                 const parsed = JSON.parse(m)
                 switch (parsed.Type) {
                     case "c":
-                        onControlMessage(parsed, props.player);
+                        if (!props.leader) {
+                            onControlMessage(parsed, props.player);
+                        }
                         break;
                     case "i":
                         onInfoMessage(parsed, props, props.conn);
