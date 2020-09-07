@@ -145,9 +145,13 @@ const VideoApp = () => {
     }, [])
 
     const createUser = (u, connection) => {
+        if (!u) {
+            return
+        }
+
         // We take the optional parameter for connection for the cases where the state might not have yet been set
-        const conn = connection ? connection : conn
-        conn.send(JSON.stringify({Type: "i", Action: "name", Data: u}))
+        const useConn = connection ? connection : conn
+        useConn.send(JSON.stringify({Type: "i", Action: "name", Data: u}))
         localStorage.setItem("username", u)
         setUsername(u);
     }

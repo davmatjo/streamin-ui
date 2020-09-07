@@ -11,7 +11,7 @@ const UserInput = (props) => {
     const [username, setUsername] = useState("");
 
     const handleClose = () => {
-        props.onSetUsername(username);
+        props.onSetUsername(username, null);
     }
 
     return (

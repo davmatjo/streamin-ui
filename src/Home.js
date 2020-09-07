@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
         height: "30vh"
     },
     fab: {
-        position: 'absolute',
+        position: 'fixed',
         bottom: theme.spacing(5),
         right: theme.spacing(5),
     },
@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
     },
     userPaper: {
         padding: theme.spacing(2),
-        position: "absolute",
+        position: "fixed",
         bottom: theme.spacing(3),
         left: theme.spacing(3),
         width: "40vw"
@@ -59,7 +59,7 @@ const Home = () => {
     const history = useHistory();
 
     const [panels, setPanels] = useState([]);
-    const [username, setUsername] = useState("");
+    const [username, setUsername] = useState(null);
 
     const onSessionCreate = async () => {
         const resp = await fetch("/api/sessions/create", {method: "POST"})
@@ -81,12 +81,12 @@ const Home = () => {
     }
 
     useEffect(() => {
-        if (!username) {
-            const loadedUser = localStorage.getItem("username");
-            if (loadedUser) {
-                setUsername(loadedUser)
+        if (username === null || username === undefined) {
+            const loaded = localStorage.getItem("username")
+            if (loaded === null || loaded === undefined) {
+                setUsername("")
             } else {
-                localStorage.setItem("username", "")
+                setUsername(loaded)
             }
         } else {
             localStorage.setItem("username", username)
