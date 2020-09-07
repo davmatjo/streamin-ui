@@ -81,15 +81,21 @@ const VideoApp = () => {
     // Handles closing the websocket connection on component unmount. Additionally removes the reconnect fn from onclose
     useEffect(() => {
         return () => {
-            console.log("destroying conn")
             if (conn) {
-                console.log("destroying conn fo real")
-                conn.onclose = () => {
-                }
-                conn.close()
+                conn.onclose = () => {};
+                conn.close();
             }
         }
     }, [conn])
+
+    useEffect(() => {
+        return () => {
+            if (player) {
+                player.stop();
+                player.dispose();
+            }
+        }
+    }, [player])
 
     // Sets up the websocket on component mount and sends initial protocol messages
     useEffect(() => {
