@@ -119,8 +119,7 @@ const Chat = (props) => {
                 </form>
             </div>
         </div>
-    )
-        ;
+    );
 };
 
 export default Chat;

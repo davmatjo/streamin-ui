@@ -32,7 +32,7 @@ const onInfoMessage = (m, props, conn) => {
     switch (m.Action) {
         case "leader":
             console.log("Elected as leader")
-            setInterval(() => {
+            const i = setInterval(() => {
                 if (!props.player || !props.player.getPosition) {
                     return
                 }
@@ -43,13 +43,15 @@ const onInfoMessage = (m, props, conn) => {
                     data: props.player.getPosition()
                 }));
 
-
                 conn.send(JSON.stringify({
                     type: "c",
                     action: props.player.getPlayerState() === "PLAYING" ? "play" : "pause",
                 }));
             }, 3000)
-
+            conn.addEventListener("close", () => {
+                console.log("disconnected from leader")
+                clearInterval(i)
+            })
 
             props.player.addEventListener("playerStateChange", (e) => {
                 switch (e) {
