@@ -11,6 +11,13 @@ import CloseIcon from '@material-ui/icons/Close';
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
+import AppBar from "@material-ui/core/AppBar"
+import TabPanel from "@material-ui/lab/TabPanel";
+import Tab from "@material-ui/core/Tab";
+import TabList from "@material-ui/lab/TabList";
+import TabContext from "@material-ui/lab/TabContext";
+import UnprocessedMedia from "./UnprocessedMedia";
+import ProcessedMedia from "./ProcessedMedia";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -35,7 +42,8 @@ const useStyles = makeStyles((theme) => ({
     close: {
         position: 'absolute',
         top: theme.spacing(1),
-        right: theme.spacing(1)
+        right: theme.spacing(1),
+        zIndex: 99
     },
     thumb: {
         height: "70%",
@@ -51,15 +59,16 @@ const useStyles = makeStyles((theme) => ({
     fill: {
         width: "100%",
         height: "100%"
-    }
+    },
 }));
 
-const Home = () => {
+function Home(props) {
     const classes = useStyles();
     const history = useHistory();
 
     const [panels, setPanels] = useState([]);
-    const [username, setUsername] = useState(null);
+    const [username, setUsername] = useState("");
+    const [tab, setTab] = useState("1");
 
     const onSessionCreate = async () => {
         const resp = await fetch("/api/sessions/create", {method: "POST"})
@@ -76,21 +85,18 @@ const Home = () => {
     const getSessions = async () => {
         const resp = await fetch("/api/sessions")
         const parsed = await resp.json()
-        console.log(parsed)
         setPanels(parsed.Sessions)
     }
 
     useEffect(() => {
-        if (username === null || username === undefined) {
-            const loaded = localStorage.getItem("username")
-            if (loaded === null || loaded === undefined) {
-                setUsername("")
-            } else {
-                setUsername(loaded)
-            }
-        } else {
-            localStorage.setItem("username", username)
+        const u = localStorage.getItem("username")
+        if (u !== null) {
+            setUsername(u)
         }
+    }, [])
+
+    useEffect(() => {
+        localStorage.setItem("username", username)
     }, [username])
 
     useEffect(() => {
@@ -103,66 +109,92 @@ const Home = () => {
     }, [])
 
     return (
-        <div className={classes.root}>
-            {panels.length === 0 && <div className={classes.root}>
-                <h1>No sessions are active.</h1>
-            </div>}
+        <div>
+            <TabContext value={tab}>
+                <AppBar position="static">
+                    <TabList
+                        onChange={(e, v) => setTab(v)}
+                        aria-label="simple tabs example"
+                        centered
+                    >
+                        <Tab label="Watch" value="1"/>
+                        <Tab label="Available" value="2"/>
+                        <Tab label="Unprocessed" value="3"/>
+                    </TabList>
+                </AppBar>
+                <TabPanel value="3">
+                    <UnprocessedMedia/>
+                </TabPanel>
+                <TabPanel value="2">
+                    <ProcessedMedia/>
+                </TabPanel>
+                <TabPanel value="1">
+                    <div className={classes.root}>
+                        {panels.length === 0 && <div className={classes.root}>
+                            <h1>No sessions are active.</h1>
+                        </div>}
 
-            <Grid container spacing={6}>
-                {panels.map(p => (
-                    <Grid item xs={12} md={4} xl={3}>
-                        <ButtonBase
-                            className={classes.fill}
-                            onClick={() => {
-                                history.push(`/watch/${p.Id}`)
-                            }}
-                        >
-                            <Paper className={classes.paper}>
-                                <h3>{p.Media ? p.Media : "No Media Playing"}</h3>
-                                <IconButton
-                                    className={classes.close}
-                                    aria-label="delete"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onSessionDelete(p.Id)
-                                    }}
-                                >
-                                    <CloseIcon/>
-                                </IconButton>
-                                <div style={{height: "60%", width: "100%", backgroundColor: "black"}}/>
-                                <p>Room ID: {p.Id}</p>
-                                <Button
-                                    fullWidth
-                                    variant="outlined"
-                                    color="primary"
-                                    disabled
-                                    className={classes.button}
-                                    startIcon={<VisibilityIcon/>}
-                                >
-                                    {p.Viewers}
-                                </Button>
-                            </Paper>
-                        </ButtonBase>
-                    </Grid>
-                ))}
-            </Grid>
-            <Paper className={classes.userPaper} elevation={5}>
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="name"
-                    variant="outlined"
-                    label="Username"
-                    fullWidth
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-            </Paper>
-            <Fab className={classes.fab} color="primary" aria-label="add" onClick={onSessionCreate}>
-                <AddIcon/>
-            </Fab>
+                        <Grid container spacing={6}>
+                            {panels.map(p => (
+                                <Grid item xs={12} md={4} xl={3}>
+                                    <div style={{position: "relative"}}>
+                                        <IconButton
+                                            className={classes.close}
+                                            aria-label="delete"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onSessionDelete(p.Id)
+                                            }}
+                                        >
+                                            <CloseIcon/>
+                                        </IconButton>
+                                        <ButtonBase
+                                            className={classes.fill}
+                                            onClick={() => {
+                                                history.push(`/watch/${p.Id}`)
+                                            }}
+                                        >
+                                            <Paper className={classes.paper}>
+                                                <h3>{p.Media ? p.Media : "No Media Playing"}</h3>
+                                                <div style={{height: "60%", width: "100%", backgroundColor: "black"}}/>
+                                                <p>Room ID: {p.Id}</p>
+                                                <Button
+                                                    fullWidth
+                                                    variant="outlined"
+                                                    color="primary"
+                                                    disabled
+                                                    startIcon={<VisibilityIcon/>}
+                                                    component={"div"}
+                                                >
+                                                    {p.Viewers}
+                                                </Button>
+                                            </Paper>
+                                        </ButtonBase>
+                                    </div>
+                                </Grid>
+                            ))}
+                        </Grid>
+                        <Paper className={classes.userPaper} elevation={5}>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="name"
+                                variant="outlined"
+                                label="Username"
+                                fullWidth
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
+                        </Paper>
+                        <Fab className={classes.fab} color="primary" aria-label="add" onClick={onSessionCreate}>
+                            <AddIcon/>
+                        </Fab>
+                    </div>
+                </TabPanel>
+            </TabContext>
+
         </div>
     )
-};
+}
 
 export default Home;

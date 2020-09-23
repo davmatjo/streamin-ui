@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Chat = (props) => {
+function Chat(props) {
     const classes = useStyles();
 
     const bottom = useRef(null);
@@ -120,6 +120,6 @@ const Chat = (props) => {
             </div>
         </div>
     );
-};
+}
 
 export default Chat;
