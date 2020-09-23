@@ -22,6 +22,12 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      
       - name: Docker Login
         # You may pin to the exact commit or the version.
         # uses: docker/login-action@a5ba64f65ee2b5b4a09d1e4e52c081f2040f0c5f
@@ -66,4 +72,5 @@ jobs:
         # uses: docker/build-push-action@ab83648e2e224cfeeab899e23b639660765c3a89
         uses: docker/build-push-action@v2
         with:
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.prep.outputs.tags }}
