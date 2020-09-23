@@ -64,7 +64,7 @@ const enterFullscreen = (player) => {
     }
 }
 
-const VideoController = (props) => {
+function VideoController(props) {
     const classes = useStyles();
 
     let [videoTracks, setVideoTracks] = useState(null);

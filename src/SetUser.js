@@ -26,16 +26,16 @@ const UserInput = (props) => {
                     e.preventDefault();
                     return false;
                 }}>
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="name"
-                    variant="outlined"
-                    label="Username"
-                    fullWidth
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="name"
+                        variant="outlined"
+                        label="Username"
+                        fullWidth
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
                 </form>
             </DialogContent>
             <DialogActions>

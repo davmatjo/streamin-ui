@@ -54,7 +54,7 @@ const initVid = (vid) => {
     return player
 }
 
-const VideoApp = () => {
+function VideoApp() {
     const classes = useStyles();
     const vid = useRef(null);
     const [update, setUpdate] = useState(false);
@@ -82,7 +82,8 @@ const VideoApp = () => {
     useEffect(() => {
         return () => {
             if (conn) {
-                conn.onclose = () => {};
+                conn.onclose = () => {
+                };
                 conn.close();
             }
         }

@@ -73,7 +73,7 @@ const onInfoMessage = (m, props, conn) => {
     }
 }
 
-const Communicator = (props) => {
+function Communicator(props) {
 
     useEffect(() => {
         if (!props.conn) {
@@ -110,6 +110,6 @@ const Communicator = (props) => {
     }, [props])
 
     return null;
-};
+}
 
 export default Communicator;
